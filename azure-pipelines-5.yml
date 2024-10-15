@@ -34,4 +34,11 @@ stages:
           Set-AzKeyVaultAccessPolicy -VaultName $(keyVaultName) -AccessPolicy $accessPolicy
           
           Write-Output "Granted Azure Data Factory '$($dataFactoryName)' access to Key Vault '$($keyVaultName)'."
-        azurePowerShellVersion: 'LatestVersion'
+          # Test the access by trying to get the secret
+          try {
+              $secret = Get-AzKeyVaultSecret -VaultName $(keyVaultName) -Name $(secretName)
+              Write-Output "Access granted! Retrieved secret '$($secretName)': $($secret.Value)"
+           } catch {
+              Write-Error "Access denied! Unable to retrieve secret '$($secretName)'. Error: $_"
+           }
+          azurePowerShellVersion: 'LatestVersion'
