@@ -5,6 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
   resourceGroupName: 'ap-dev-apollo2-smartpos-rg'
   location: 'eastasia'
   storageAccountName: 'apdevapollo2possmart01'
