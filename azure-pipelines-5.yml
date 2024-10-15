@@ -35,4 +35,4 @@ stages:
           
           Write-Output "Granted Azure Data Factory '$($dataFactoryName)' access to Key Vault '$($keyVaultName)'."
         
-          azurePowerShellVersion: 'latestVersion'
+          azurePowerShellVersion: 1.0.1
