@@ -6,7 +6,7 @@ pool:
 
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-  resourceGroupName: 'ap-dev-apollo33-smartpos-rg'
+  resourceGroup: 'ap-dev-apollo33-smartpos-rg'
   location: 'southindia'               # e.g., 'eastus'
   storageAccount: 'apdevapollo33possmart01'      # Unique name for the storage account
 
