@@ -19,24 +19,30 @@ stages:
     steps:
     - task: AzureCLI@2
       inputs:
-        azureSubscription: $(azureSubscription)
-        scriptType: 'bash'
+        azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+        scriptType: 'ps'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          # Log in to Azure
-          echo "Logging in to Azure"
-          az account set --subscription $(azureSubscription)
-
-          # Create Resource Group if it does not exist
-          echo "Creating Resource Group"
-          az group create --name $(resourceGroup) --location $(location)
-
-          # Create Storage Account
-          echo "Creating Storage Account"
-          az storage account create --name $(storageAccount) --location $(location) --resource-group $(resourceGroup) --sku Standard_LRS
-
-          # Create Function App
-          echo "Creating Function App"
-          az functionapp create --resource-group $(resourceGroup) --consumption-plan-location $(location) --runtime $(runtime) --functions-version 3 --name $(functionAppName) --storage-account $(storageAccount)
-
-          echo "Deployment complete."
+          # Function app and storage account names must be unique.
+          
+          # Variable block
+          $randomIdentifier = Get-Random
+          $location = "eastus"
+          $resourceGroup = "msdocs-azure-functions-rg-$randomIdentifier"
+          $tag = @{script = "create-function-app-consumption"}
+          $storage = "msdocsaccount$randomIdentifier"
+          $functionApp = "msdocs-serverless-function-$randomIdentifier"
+          $skuStorage = "Standard_LRS"
+          $functionsVersion = "4"
+          
+          # Create a resource group
+          Write-Host "Creating $resourceGroup in $location..."
+          New-AzResourceGroup -Name $resourceGroup -Location $location -Tag $tag
+          
+          # Create an Azure storage account in the resource group.
+          Write-Host "Creating $storage"
+          New-AzStorageAccount -Name $storage -Location $location -ResourceGroupName $resourceGroup -SkuName $skuStorage
+          
+          # Create a serverless function app in the resource group.
+          Write-Host "Creating $functionApp"
+          New-AzFunctionApp -Name $functionApp -StorageAccountName $storage -Location $location -ResourceGroupName $resourceGroup -Runtime DotNet-Isolated -FunctionsVersion $functionsVersion
