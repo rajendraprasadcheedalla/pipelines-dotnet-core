@@ -70,7 +70,7 @@ stages:
           if (-not $functionAppExists) {
              # Create a Consumption Plan for the Function App
               $planName = "$(functionAppName)-plan"
-              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'Y1'-WorkerType Windows
+              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'EP1'-WorkerType Windows
               $storageAccountConnectionString = (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context.ConnectionString
               New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName  -Runtime 'dotnet' -FunctionsVersion '3' -ConnectionString $storageAccountConnectionString
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
