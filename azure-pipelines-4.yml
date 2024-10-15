@@ -8,10 +8,10 @@ variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
   resourceGroup: 'dev2-smartpos-rg'
   location: 'southindia'               # e.g., 'eastus'
-  storageAccount: 'dev3smartposstorageac'      # Unique name for the storage account
-  dataFactory: 'dev3smartposadf'         # Name for the Azure Data Factory
-  keyVault: 'dev3smartposkeyvalut'               # Unique name for the Azure Key Vault
-  functionAppName: 'dev3smartposfunctionapp'     # Unique name for the Azure Function App
+  storageAccount: 'dev4smartposstorageac'      # Unique name for the storage account
+  dataFactory: 'dev4smartposadf'         # Name for the Azure Data Factory
+  keyVault: 'dev4smartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'dev4smartposfunctionapp'     # Unique name for the Azure Function App
   IsLinux : false
 stages:
 - stage: CreateResources
@@ -70,7 +70,7 @@ stages:
           if (-not $functionAppExists) {
              # Create a Consumption Plan for the Function App
               $planName = "$(functionAppName)-plan"
-              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'Y1' -Tier 'Consumption'
+              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'Y1'
               $storageAccountConnectionString = (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context.ConnectionString
               New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName  -Runtime 'dotnet' -FunctionsVersion '3' -ConnectionString $storageAccountConnectionString
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
