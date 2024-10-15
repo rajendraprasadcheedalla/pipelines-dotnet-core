@@ -10,7 +10,7 @@ variables:
   functionAppName: 'msdocs-serverless-function'
   storageAccount: 'msdocsaccount'
   location: 'eastus'
-  runtime: 'node'  # or 'dotnet', 'python', etc.
+  runtime: 'c#'
 
 stages:
 - stage: Deploy
