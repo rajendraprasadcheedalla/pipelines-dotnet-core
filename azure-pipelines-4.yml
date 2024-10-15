@@ -6,12 +6,12 @@ pool:
 
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-  resourceGroup: 'dev-smartpos-rg'
+  resourceGroup: 'dev1-smartpos-rg'
   location: 'southindia'               # e.g., 'eastus'
-  storageAccount: 'devsmartposstorageac'      # Unique name for the storage account
-  dataFactory: 'devsmartposadf'         # Name for the Azure Data Factory
-  keyVault: 'devsmartposkeyvalut'               # Unique name for the Azure Key Vault
-  functionAppName: 'devsmartposfunctionapp'     # Unique name for the Azure Function App
+  storageAccount: 'dev1smartposstorageac'      # Unique name for the storage account
+  dataFactory: 'dev1smartposadf'         # Name for the Azure Data Factory
+  keyVault: 'dev1smartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'dev1smartposfunctionapp'     # Unique name for the Azure Function App
 
 stages:
 - stage: CreateResources
