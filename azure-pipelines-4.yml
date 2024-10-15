@@ -1,0 +1,77 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+  resourceGroup: 'dev-smartpos-rg'
+  location: 'southindia'               # e.g., 'eastus'
+  storageAccount: 'devsmartposstorageac'      # Unique name for the storage account
+  dataFactory: 'devsmartposadf'         # Name for the Azure Data Factory
+  keyVault: 'devsmartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'devsmartposfunctionapp'     # Unique name for the Azure Function App
+
+stages:
+- stage: CreateResources
+  jobs:
+  - job: CreateAzureResources
+    steps:
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: $(azureSubscription)
+        ScriptType: 'InlineScript'
+        Inline: |
+          # Check if the resource group exists
+          $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
+
+          if (-not $resourceGroupExists) {
+              # Create the resource group
+              New-AzResourceGroup -Name $(resourceGroup) -Location $(location)
+              Write-Output "Resource Group '$(resourceGroup)' created successfully."
+          } else {
+              Write-Output "Resource Group '$(resourceGroup)' already exists."
+          }
+
+          # Create Storage Account
+          $storageAccountExists = Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount) -ErrorAction SilentlyContinue
+
+          if (-not $storageAccountExists) {
+              New-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount) -Location $(location) -SkuName Standard_LRS -Kind StorageV2
+              Write-Output "Storage Account '$(storageAccount)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Storage Account '$(storageAccount)' already exists in resource group '$(resourceGroup)'."
+          }
+
+          # Create Azure Data Factory
+          $dataFactoryExists = Get-AzDataFactoryV2 -ResourceGroupName $(resourceGroup) -Name $(dataFactory) -ErrorAction SilentlyContinue
+
+          if (-not $dataFactoryExists) {
+              New-AzDataFactoryV2 -ResourceGroupName $(resourceGroup) -Name $(dataFactory) -Location $(location)
+              Write-Output "Azure Data Factory '$(dataFactory)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Azure Data Factory '$(dataFactory)' already exists in resource group '$(resourceGroup)'."
+          }
+
+          # Create Key Vault
+          $keyVaultExists = Get-AzKeyVault -ResourceGroupName $(resourceGroup) -VaultName $(keyVault) -ErrorAction SilentlyContinue
+
+          if (-not $keyVaultExists) {
+              New-AzKeyVault -ResourceGroupName $(resourceGroup) -VaultName $(keyVault) -Location $(location) -Sku 'Standard'
+              Write-Output "Key Vault '$(keyVault)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Key Vault '$(keyVault)' already exists in resource group '$(resourceGroup)'."
+          }
+
+          # Create Function App
+          $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
+
+          if (-not $functionAppExists) {
+              $storageAccountConnectionString = (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context.ConnectionString
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -AppServicePlan $functionAppName -Runtime 'dotnet' -FunctionsVersion '3' -ConnectionString $storageAccountConnectionString
+              Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
+          }
+        azurePowerShellVersion: 'LatestVersion'
