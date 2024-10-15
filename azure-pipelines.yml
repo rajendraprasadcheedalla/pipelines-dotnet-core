@@ -2,46 +2,28 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
-  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-  resourceGroup: 'msdocs-azure-functions-rg'
-  functionAppName: 'msdocs-serverless-function'
-  storageAccount: 'msdocsaccount'
-  location: 'eastus'
-  runtime: 'c#'
+  resourceGroupName: 'ap-dev-apollo2-smartpos-rg'
+  location: 'eastasia'
+  storageAccountName: 'apdevapollo2possmart01'
+  containerName: 'posinventorycontainer'
+  configTableName: 'InventoryFlowSettings'
+  lookupTableName: 'StoreSmartPosLookup'
 
-stages:
-- stage: Deploy
-  jobs:
-  - job: DeployAzureFunction
-    steps:
-    - task: AzureCLI@1
-      inputs:
-        azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          # Function app and storage account names must be unique.
-          
-          # Variable block
-          $randomIdentifier = Get-Random
-          $location = "eastus"
-          $resourceGroup = "msdocs-azure-functions-rg-$randomIdentifier"
-          $tag = @{script = "create-function-app-consumption"}
-          $storage = "msdocsaccount$randomIdentifier"
-          $functionApp = "msdocs-serverless-function-$randomIdentifier"
-          $skuStorage = "Standard_LRS"
-          $functionsVersion = "4"
-          
-          # Create a resource group
-          Write-Host "Creating $resourceGroup in $location..."
-          New-AzResourceGroup -Name $resourceGroup -Location $location -Tag $tag
-          
-          # Create an Azure storage account in the resource group.
-          Write-Host "Creating $storage"
-          New-AzStorageAccount -Name $storage -Location $location -ResourceGroupName $resourceGroup -SkuName $skuStorage
-          
-          # Create a serverless function app in the resource group.
-          Write-Host "Creating $functionApp"
-          New-AzFunctionApp -Name $functionApp -StorageAccountName $storage -Location $location -ResourceGroupName $resourceGroup -Runtime DotNet-Isolated -FunctionsVersion $functionsVersion
+steps:
+- script: echo start create development infrastructure!
+  displayName: 'Run a one-line script'
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      if [ $(az group exists --name $resourceGroup) = false ]; then 
+        az group create  --location $location --resource-group  $resourceGroupName
+      else
+        echo $resourceGroup is existing
+      fi
