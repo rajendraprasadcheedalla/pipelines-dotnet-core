@@ -12,7 +12,7 @@ variables:
   dataFactory: 'dev1smartposadf'         # Name for the Azure Data Factory
   keyVault: 'dev1smartposkeyvalut'               # Unique name for the Azure Key Vault
   functionAppName: 'dev1smartposfunctionapp'     # Unique name for the Azure Function App
-
+  IsLinux : false
 stages:
 - stage: CreateResources
   jobs:
