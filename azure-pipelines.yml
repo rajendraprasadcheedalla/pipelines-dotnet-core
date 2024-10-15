@@ -9,9 +9,9 @@ variables:
   resourceGroupName: 'ap-dev-apollo2-smartpos-rg'
   location: 'eastasia'
   storageAccountName: 'apdevapollo2possmart01'
-  containerName: 'posinventorycontainer'
-  configTableName: 'InventoryFlowSettings'
-  lookupTableName: 'StoreSmartPosLookup'
+  # containerName: 'posinventorycontainer'
+  # configTableName: 'InventoryFlowSettings'
+  # lookupTableName: 'StoreSmartPosLookup'
 
 steps:
 - script: echo start create development infrastructure!
