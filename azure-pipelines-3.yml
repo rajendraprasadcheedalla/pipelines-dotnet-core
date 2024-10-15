@@ -2,18 +2,18 @@ trigger:
 - main
 
 pool:
-  vmImage:  ubuntu-latest
+  vmImage: 'windows-latest'
 
 variables:
-  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'  # Azure service connection name
-  resourceGroup: 'ap-dev-apollo33-smartpos-rg'        
-  storageAccountName: 'apdevapollo33possmart01'
-  location: 'southindia'               
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+  resourceGroupName: 'ap-dev-apollo33-smartpos-rg'
+  location: 'southindia'               # e.g., 'eastus'
+  storageAccount: 'apdevapollo33possmart01'      # Unique name for the storage account
 
 stages:
-- stage: CreateResourceGroup
+- stage: CreateResources
   jobs:
-  - job: CreateRG
+  - job: CreateRGAndStorageAccount
     steps:
     - task: AzurePowerShell@5
       inputs:
@@ -30,7 +30,8 @@ stages:
           } else {
               Write-Output "Resource Group '$(resourceGroup)' already exists."
           }
-           # Check if the storage account exists
+
+          # Check if the storage account exists
           $storageAccountExists = Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount) -ErrorAction SilentlyContinue
 
           if (-not $storageAccountExists) {
