@@ -8,10 +8,10 @@ variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
   resourceGroup: 'dev2-smartpos-rg'
   location: 'southindia'               # e.g., 'eastus'
-  storageAccount: 'dev2smartposstorageac'      # Unique name for the storage account
-  dataFactory: 'dev2smartposadf'         # Name for the Azure Data Factory
-  keyVault: 'dev2smartposkeyvalut'               # Unique name for the Azure Key Vault
-  functionAppName: 'dev2smartposfunctionapp'     # Unique name for the Azure Function App
+  storageAccount: 'dev3smartposstorageac'      # Unique name for the storage account
+  dataFactory: 'dev3smartposadf'         # Name for the Azure Data Factory
+  keyVault: 'dev3smartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'dev3smartposfunctionapp'     # Unique name for the Azure Function App
   IsLinux : false
 stages:
 - stage: CreateResources
