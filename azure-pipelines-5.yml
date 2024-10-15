@@ -34,5 +34,4 @@ stages:
           Set-AzKeyVaultAccessPolicy -VaultName $(keyVaultName) -AccessPolicy $accessPolicy
           
           Write-Output "Granted Azure Data Factory '$($dataFactoryName)' access to Key Vault '$($keyVaultName)'."
-        
-          azurePowerShellVersion: 1.0.1
+        azurePowerShellVersion: 'LatestVersion'
