@@ -12,9 +12,9 @@ variables:
   dataFactory: 'dev12smartposadf'         # Name for the Azure Data Factory
   keyVault: 'dev12smartposkeyvalut'               # Unique name for the Azure Key Vault
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
-  tableStorageName: 'devsmartposlookuptable'           # Name for the Azure Table Storage
-  blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
-  appInsightsName: 'smartposappinsigts'  
+  tableStorageName: 'devsmartpos1lookuptable'           # Name for the Azure Table Storage
+  blobContainerName: 'devsmartpos1container'         # Name for the Azure Blob Storage container
+  appInsightsName: 'smartposappinsights'  
 stages:
 - stage: CreateResources
   jobs:
@@ -81,15 +81,15 @@ stages:
           } else {
               Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
           }
-           # Check if the resource group exists
-          $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
+          # Check if Application Insights resource exists
+          $appInsightsExists = Get-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -ErrorAction SilentlyContinue
 
-          if (-not $resourceGroupExists) {
-              # Create the resource group
-              New-AzResourceGroup -Name $(resourceGroup) -Location $(location)
-              Write-Output "Resource Group '$(resourceGroup)' created successfully."
+          if (-not $appInsightsExists) {
+              # Create Application Insights resource
+              New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location) -ApplicationType web
+              Write-Output "Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
           } else {
-              Write-Output "Resource Group '$(resourceGroup)' already exists."
+              Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
           }
           # Create Function App
           $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
