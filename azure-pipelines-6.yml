@@ -86,7 +86,7 @@ stages:
 
           if (-not $functionAppExists) {
               # Create Function App
-              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -storageAccount $(storageAccount) -Runtime $(runtime) -Sku EP1 -WorkerType Windows
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -storageAccount $(storageAccount) -Runtime $(runtime) -Sku EP1
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
           } else {
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
