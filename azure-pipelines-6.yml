@@ -82,15 +82,17 @@ stages:
               Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
           }
           # Check if Application Insights resource exists
-          $appInsightsExists = Get-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName)
+          # $appInsightsExists = Get-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName)
 
-          if (-not $appInsightsExists) {
-              # Create Application Insights resource
-              New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
-              Write-Output "Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
-          } else {
-              Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
-          }
+            #   if (-not $appInsightsExists) {
+            #       # Create Application Insights resource
+            #       New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
+            #       Write-Output "Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
+            #   } else {
+            #       Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
+            #   }
+          New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
+
           # Create Function App
           $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName)
 
