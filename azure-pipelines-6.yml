@@ -86,7 +86,7 @@ stages:
 
           if (-not $appInsightsExists) {
               # Create Application Insights resource
-              New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location) -ApplicationType web
+              New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
               Write-Output "Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
           } else {
               Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
