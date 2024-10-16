@@ -1,0 +1,58 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+  resourceGroup: 'dev12-smartpos-rg'
+  keyVaultName: 'smartposkeyvault'              # Name of the Azure Key Vault
+  dataFactoryName: 'dev12smartposadf'        # Name of the Azure Data Factory
+  secretName: 'smartposkeyvault'                    # Name of the secret to test access
+
+stages:
+- stage: GrantAccess
+  jobs:
+  - job: GrantAccess
+    steps:
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: $(azureSubscription)
+        ScriptType: 'InlineScript'
+        Inline: |
+          # Import required module
+          Import-Module Az.KeyVault
+
+          # Get the Data Factory identity
+          $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $(resourceGroup) -Name $(dataFactoryName)
+
+          if (-not $dataFactory) {
+              Write-Error "Data Factory '$(dataFactoryName)' does not exist in resource group '$(resourceGroup)'."
+              exit 1
+          }
+
+          $dataFactoryIdentityId = $dataFactory.Identity.PrincipalId
+
+          # Get the Key Vault
+          $keyVault = Get-AzKeyVault -VaultName $(keyVaultName) -ResourceGroupName $(resourceGroup)
+
+          if (-not $keyVault) {
+              Write-Error "Key Vault '$(keyVaultName)' does not exist in resource group '$(resourceGroup)'."
+              exit 1
+          }
+
+          # Set the access policy to allow Data Factory to access the Key Vault
+          Set-AzKeyVaultAccessPolicy -VaultName $(keyVaultName) -ObjectId $dataFactoryIdentityId -PermissionsToSecrets get, list
+
+          Write-Output "Granted access to Data Factory '$(dataFactoryName)' for Key Vault '$(keyVaultName)'."
+
+          # Test access by trying to get the secret
+          try {
+              $secretValue = Get-AzKeyVaultSecret -VaultName $(keyVaultName) -Name $(secretName)
+              Write-Output "Successfully retrieved the secret '$($secretValue.Name)'. Value: $($secretValue.SecretValueText)"
+          } catch {
+              Write-Error "Failed to retrieve the secret '$($secretName)'. Error: $_"
+              exit 1
+          }
+        azurePowerShellVersion: 'LatestVersion'
