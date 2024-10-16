@@ -14,7 +14,7 @@ variables:
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
   tableStorageName: 'devsmartposlookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
-  appInsightsName: 'smartposappinsights'  
+  IsLinux : false
 stages:
 - stage: CreateResources
   jobs:
@@ -25,8 +25,6 @@ stages:
         azureSubscription: $(azureSubscription)
         ScriptType: 'InlineScript'
         Inline: |
-          # Import the required module
-          Import-Module Az.ApplicationInsights
           # Check if the resource group exists
           $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
 
@@ -81,29 +79,19 @@ stages:
           } else {
               Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
           }
-            # Check if the Function App exists
+          # Create Function App
           $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
 
           if (-not $functionAppExists) {
-              # Create Function App
-              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccountName) -Runtime $(runtime) -Sku $(sku)
+              # Create a Consumption Plan for the Function App
+              $planName = "$(functionAppName)-plan"
+              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'EP1'-WorkerType Windows
+             
+              # Create the Function App
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName -Runtime 'dotnet' -FunctionsVersion '3'
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
           } else {
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
-          }
-          # Check if Application Insights resource exists
-          # $appInsightsExists = Get-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName)
-
-            #   if (-not $appInsightsExists) {
-            #       # Create Application Insights resource
-            #       New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
-            #       Write-Output "Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
-            #   } else {
-            #       Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
-            #   }
-          New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
-
-         
           }
         
         azurePowerShellVersion: 'LatestVersion'
