@@ -12,8 +12,8 @@ variables:
   dataFactory: 'dev12smartposadf'         # Name for the Azure Data Factory
   keyVault: 'dev12smartposkeyvalut'               # Unique name for the Azure Key Vault
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
-  tableStorageName: 'devsmartpos1lookuptable'           # Name for the Azure Table Storage
-  blobContainerName: 'devsmartpos1container'         # Name for the Azure Blob Storage container
+  tableStorageName: 'devsmartposlookuptable'           # Name for the Azure Table Storage
+  blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
   appInsightsName: 'smartposappinsights'  
 stages:
 - stage: CreateResources
