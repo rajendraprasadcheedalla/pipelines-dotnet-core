@@ -1,0 +1,61 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+  resourceGroup: 'dev12-smartpos-rg'
+  location: 'southindia'               # e.g., 'eastus'
+  workspaceName: 'posworkspace'           # Name of the Log Analytics Workspace
+  appInsightsName: 'posappinsights'         # Unique name for the Application Insights resource
+
+stages:
+- stage: CreateAppInsights
+  jobs:
+  - job: CreateAppInsights
+    steps:
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: $(azureSubscription)
+        ScriptType: 'InlineScript'
+        Inline: |
+          # Import the required modules
+          Import-Module Az.Resources
+          Import-Module Az.ApplicationInsights
+          Import-Module Az.OperationalInsights
+
+          # Check if the resource group exists
+          $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
+
+          if (-not $resourceGroupExists) {
+              # Create the resource group
+              New-AzResourceGroup -Name $(resourceGroup) -Location $(location)
+              Write-Output "Resource Group '$(resourceGroup)' created successfully."
+          } else {
+              Write-Output "Resource Group '$(resourceGroup)' already exists."
+          }
+
+          # Check if the Log Analytics Workspace exists
+          $workspaceExists = Get-AzOperationalInsightsWorkspace -ResourceGroupName $(resourceGroup) -Name $(workspaceName) -ErrorAction SilentlyContinue
+
+          if (-not $workspaceExists) {
+              # Create Log Analytics Workspace
+              New-AzOperationalInsightsWorkspace -ResourceGroupName $(resourceGroup) -Name $(workspaceName) -Location $(location) -Sku "PerGB2018"
+              Write-Output "Log Analytics Workspace '$(workspaceName)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Log Analytics Workspace '$(workspaceName)' already exists in resource group '$(resourceGroup)'."
+          }
+
+          # Check if Application Insights resource exists
+          $appInsightsExists = Get-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -ErrorAction SilentlyContinue
+
+          if (-not $appInsightsExists) {
+              # Create Application Insights resource associated with the Log Analytics Workspace
+              New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location) -ApplicationType web -WorkspaceResourceId $workspaceExists.Id
+              Write-Output "Workspace-based Application Insights resource '$(appInsightsName)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Application Insights resource '$(appInsightsName)' already exists in resource group '$(resourceGroup)'."
+          }
+        azurePowerShellVersion: 'LatestVersion'
