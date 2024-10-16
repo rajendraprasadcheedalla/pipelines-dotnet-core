@@ -45,12 +45,13 @@ stages:
           } else {
               Write-Output "Storage Account '$(storageAccount)' already exists in resource group '$(resourceGroup)'."
           }
-          # Create Table Storage
+          # Create Table Storage 
           $tableService = New-AzStorageTable -Name $(tableStorageName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context
           Write-Output "Table Storage '$($tableStorageName)' created successfully in Storage Account '$($storageAccount)'."
 
           # Create Blob Container
-          $blobContainerExists = Get-AzStorageContainer -ContainerName $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -ErrorAction SilentlyContinue
+          # $blobContainerExists = Get-AzStorageContainer -ContainerName $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -ErrorAction SilentlyContinue
+            $blobContainerExists = Get-AzStorageContainer -Container $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -ErrorAction SilentlyContinue
 
           if (-not $blobContainerExists) {
               New-AzStorageContainer -Name $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -PublicAccess Off
