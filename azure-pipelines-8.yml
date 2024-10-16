@@ -7,9 +7,9 @@ pool:
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
   resourceGroup: 'dev12-smartpos-rg'
-  keyVaultName: 'smartposkeyvault'              # Name of the Azure Key Vault
+  keyVaultName: 'smartposkeyvault1'              # Name of the Azure Key Vault
   dataFactoryName: 'dev12smartposadf'        # Name of the Azure Data Factory
-  secretName: 'smartposkeyvault1'                    # Name of the secret to test access
+  secretName: 'testsecret'                    # Name of the secret to test access
 
 stages:
 - stage: GrantAccess
