@@ -6,12 +6,12 @@ pool:
 
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-  resourceGroup: 'dev7-smartpos-rg'
+  resourceGroup: 'dev8-smartpos-rg'
   location: 'southindia'               # e.g., 'eastus'
-  storageAccount: 'dev7smartposstorageac'      # Unique name for the storage account
-  dataFactory: 'dev7smartposadf'         # Name for the Azure Data Factory
-  keyVault: 'dev7smartposkeyvalut'               # Unique name for the Azure Key Vault
-  functionAppName: 'dev7smartposfunctionapp'     # Unique name for the Azure Function App
+  storageAccount: 'dev8smartposstorageac'      # Unique name for the storage account
+  dataFactory: 'dev8smartposadf'         # Name for the Azure Data Factory
+  keyVault: 'dev8smartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'dev8smartposfunctionapp'     # Unique name for the Azure Function App
   tableStorageName: 'smartposlookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'smartposcontainer'         # Name for the Azure Blob Storage container
   IsLinux : false
