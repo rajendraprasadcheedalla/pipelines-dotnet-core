@@ -9,7 +9,7 @@ variables:
   resourceGroup: 'dev12-smartpos-rg'
   keyVaultName: 'smartposkeyvault'              # Name of the Azure Key Vault
   dataFactoryName: 'dev12smartposadf'        # Name of the Azure Data Factory
-  secretName: 'smartposkeyvault'                    # Name of the secret to test access
+  secretName: 'smartposkeyvault1'                    # Name of the secret to test access
 
 stages:
 - stage: GrantAccess
