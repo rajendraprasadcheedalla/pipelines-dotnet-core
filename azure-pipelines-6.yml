@@ -91,7 +91,6 @@ stages:
           } else {
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
           }
-
-        
+       
           }
         azurePowerShellVersion: 'LatestVersion'
