@@ -93,19 +93,16 @@ stages:
             #   }
           New-AzApplicationInsights -ResourceGroupName $(resourceGroup) -Name $(appInsightsName) -Location $(location)
 
-          # Create Function App
-          $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName)
+           # Check if the Function App exists
+          $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
 
           if (-not $functionAppExists) {
-              # Create a Consumption Plan for the Function App
-              $planName = "$(functionAppName)-plan"
-              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'EP1'-WorkerType Windows
-             
-              # Create the Function App
-              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName -Runtime 'dotnet' -FunctionsVersion '3'
+              # Create Function App
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccountName) -Runtime $(runtime) -Sku $(sku)
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
           } else {
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
+          }
           }
         
         azurePowerShellVersion: 'LatestVersion'
