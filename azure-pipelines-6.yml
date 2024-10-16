@@ -12,7 +12,7 @@ variables:
   dataFactory: 'dev12smartposadf'         # Name for the Azure Data Factory
   keyVault: 'dev12smartposkeyvalut'               # Unique name for the Azure Key Vault
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
-  tableStorageName: 'devsmartpos12lookuptable'           # Name for the Azure Table Storage
+  tableStorageName: 'devsmartpos123lookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
   IsLinux : false
   runtime: 'dotnet'
