@@ -14,7 +14,7 @@ variables:
   functionAppName: 'dev7smartposfunctionapp'     # Unique name for the Azure Function App
   tableStorageName: 'smartposlookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'smartposcontainer'         # Name for the Azure Blob Storage container
-
+  IsLinux : false
 stages:
 - stage: CreateResources
   jobs:
@@ -45,7 +45,18 @@ stages:
           } else {
               Write-Output "Storage Account '$(storageAccount)' already exists in resource group '$(resourceGroup)'."
           }
+          # Create Table Storage
+          $tableService = New-AzStorageTable -Name $(tableStorageName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context
+          Write-Output "Table Storage '$($tableStorageName)' created successfully in Storage Account '$($storageAccount)'."
 
+          # Create Blob Container
+          $blobContainerExists = Get-AzStorageContainer -ContainerName $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -ErrorAction SilentlyContinue
+
+          if (-not $blobContainerExists) {
+              New-AzStorageContainer -Name $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -PublicAccess Off
+              Write-Output "Blob Container '$($blobContainerName)' created successfully in Storage Account '$($storageAccount)'."
+          } else {
+              Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
           # Create Azure Data Factory
           $dataFactoryExists = Get-AzDataFactoryV2 -ResourceGroupName $(resourceGroup) -Name $(dataFactory) -ErrorAction SilentlyContinue
 
@@ -81,17 +92,6 @@ stages:
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
           }
 
-          # Create Table Storage
-          $tableService = New-AzStorageTable -Name $(tableStorageName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context
-          Write-Output "Table Storage '$($tableStorageName)' created successfully in Storage Account '$($storageAccount)'."
-
-          # Create Blob Container
-          $blobContainerExists = Get-AzStorageContainer -ContainerName $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -ErrorAction SilentlyContinue
-
-          if (-not $blobContainerExists) {
-              New-AzStorageContainer -Name $(blobContainerName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context -PublicAccess Off
-              Write-Output "Blob Container '$($blobContainerName)' created successfully in Storage Account '$($storageAccount)'."
-          } else {
-              Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
+        
           }
         azurePowerShellVersion: 'LatestVersion'
