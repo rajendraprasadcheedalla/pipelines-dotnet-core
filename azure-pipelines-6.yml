@@ -65,21 +65,6 @@ stages:
           } else {
               Write-Output "Key Vault '$(keyVault)' already exists in resource group '$(resourceGroup)'."
           }
-
-          # Create Function App
-          $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
-
-          if (-not $functionAppExists) {
-              # Create a Consumption Plan for the Function App
-              $planName = "$(functionAppName)-plan"
-              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'Y1' -IsLinux $false -Tier 'Consumption'
-              
-              # Create the Function App
-              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName -Runtime 'dotnet' -FunctionsVersion '3'
-              Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
-          } else {
-              Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
-          }
           # Create Table Storage 
           $tableService = New-AzStorageTable -Name $(tableStorageName) -Context (Get-AzStorageAccount -ResourceGroupName $(resourceGroup) -Name $(storageAccount)).Context
           Write-Output "Table Storage '$($tableStorageName)' created successfully in Storage Account '$($storageAccount)'."
@@ -94,4 +79,19 @@ stages:
           } else {
               Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
           }
+          # Create Function App
+          $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
+
+          if (-not $functionAppExists) {
+              # Create a Consumption Plan for the Function App
+              $planName = "$(functionAppName)-plan"
+              New-AzFunctionAppPlan -ResourceGroupName $(resourceGroup) -Name $planName -Location $(location) -Sku 'Y1' -IsLinux $false -Tier 'Consumption'
+              
+              # Create the Function App
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -StorageAccountName $(storageAccount) -Plan $planName -Runtime 'dotnet' -FunctionsVersion '3'
+              Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
+          } else {
+              Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
+          }
+        
         azurePowerShellVersion: 'LatestVersion'
