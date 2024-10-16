@@ -12,7 +12,7 @@ variables:
   dataFactory: 'dev12smartposadf'         # Name for the Azure Data Factory
   keyVault: 'dev12smartposkeyvalut'               # Unique name for the Azure Key Vault
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
-  tableStorageName: 'devsmartposlookuptable'           # Name for the Azure Table Storage
+  tableStorageName: 'devsmartpos12lookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
   IsLinux : false
   runtime: 'dotnet'
@@ -86,7 +86,7 @@ stages:
 
           if (-not $functionAppExists) {
               # Create Function App
-              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -storageAccount $(storageAccount) -Runtime $(runtime) -Sku $(sku)
+              New-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -Location $(location) -storageAccount $(storageAccount) -Runtime $(runtime) -Sku EP1 -WorkerType Windows
               Write-Output "Function App '$(functionAppName)' created successfully in resource group '$(resourceGroup)'."
           } else {
               Write-Output "Function App '$(functionAppName)' already exists in resource group '$(resourceGroup)'."
