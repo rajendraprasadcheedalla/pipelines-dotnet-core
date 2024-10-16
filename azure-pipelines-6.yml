@@ -14,7 +14,7 @@ variables:
   functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
   tableStorageName: 'devsmartposlookuptable'           # Name for the Azure Table Storage
   blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
-  IsLinux : false
+  appInsightsName: 'smartposappinsigts'  
 stages:
 - stage: CreateResources
   jobs:
@@ -25,6 +25,8 @@ stages:
         azureSubscription: $(azureSubscription)
         ScriptType: 'InlineScript'
         Inline: |
+          # Import the required module
+          Import-Module Az.ApplicationInsights
           # Check if the resource group exists
           $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
 
@@ -78,6 +80,16 @@ stages:
               Write-Output "Blob Container '$($blobContainerName)' created successfully in Storage Account '$($storageAccount)'."
           } else {
               Write-Output "Blob Container '$($blobContainerName)' already exists in Storage Account '$($storageAccount)'."
+          }
+           # Check if the resource group exists
+          $resourceGroupExists = Get-AzResourceGroup -Name $(resourceGroup) -ErrorAction SilentlyContinue
+
+          if (-not $resourceGroupExists) {
+              # Create the resource group
+              New-AzResourceGroup -Name $(resourceGroup) -Location $(location)
+              Write-Output "Resource Group '$(resourceGroup)' created successfully."
+          } else {
+              Write-Output "Resource Group '$(resourceGroup)' already exists."
           }
           # Create Function App
           $functionAppExists = Get-AzFunctionApp -ResourceGroupName $(resourceGroup) -Name $(functionAppName) -ErrorAction SilentlyContinue
