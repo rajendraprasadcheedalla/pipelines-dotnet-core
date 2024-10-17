@@ -1,48 +1,35 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
+- main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-    scriptType: 'ps'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      # Function app and storage account names must be unique.
-      
-      # Variable block
-      let "randomIdentifier=$RANDOM*$RANDOM"
-      location="eastus"
-      resourceGroup="msdocs-azure-functions-rg-$randomIdentifier"
-      tag="create-function-app-consumption"
-      storage="msdocsaccount$randomIdentifier"
-      functionApp="msdocs-serverless-function-$randomIdentifier"
-      skuStorage="Standard_LRS"
-      functionsVersion="4"
-      
-      # Create a resource group
-      echo "Creating $resourceGroup in "$location"..."
-      az group create --name $resourceGroup --location "$location" --tags $tag
-      
-      # Create an Azure storage account in the resource group.
-      echo "Creating $storage"
-      az storage account create --name $storage --location "$location" --resource-group $resourceGroup --sku $skuStorage
-      
-      # Create a serverless function app in the resource group.
-      echo "Creating $functionApp"
-      az functionapp create --name $functionApp --storage-account $storage --consumption-plan-location "$location" --resource-group $resourceGroup --functions-version $functionsVersion
+variables:
+  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
+  resourceGroup: 'dev12-smartpos-rg'
+  location: 'southindia'               # e.g., 'eastus'
+  storageAccount: 'dev12smartposstorageac'      # Unique name for the storage account
+  dataFactory: 'dev12smartposadf'         # Name for the Azure Data Factory
+  keyVault: 'dev12smartposkeyvalut'               # Unique name for the Azure Key Vault
+  functionAppName: 'dev12smartposfunctionapp'     # Unique name for the Azure Function App
+  tableStorageName: 'devsmartpos12lookuptable'           # Name for the Azure Table Storage
+  blobContainerName: 'devsmartposcontainer'         # Name for the Azure Blob Storage container
+  IsLinux : false
+  runtime: 'dotnet'
+  sku: 'EP1' 
+stages:
+- stage: CreateResources
+  jobs:
+  - job: CreateAzureResources
+    steps:
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: $(azureSubscription)
+        ScriptType: 'InlineScript'
+        Inline: |
+         ge Blob Data Contributor" --scope /subscriptions/$(subscriptionId)/resourceGroups/$(fallbackResourceGroupName)/providers/Microsoft.Storage/storageAccounts/$(fallbackStorageAccountName)
+         az role assignment create --assignee $principalId --role "Storage Table Data Contributor" --scope /subscriptions/$(subscriptionId)/resourceGroups/$(fallbackResourceGroupName)/providers/Microsoft.Storage/storageAccounts/$(fallbackStorageAccountName)
+          }
+          
+        
+        azurePowerShellVersion: 'LatestVersion'
