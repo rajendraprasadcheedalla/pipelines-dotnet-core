@@ -52,10 +52,10 @@ stages:
               Write-Error "Key Vault '$keyVaultName' does not exist in resource group '$resourceGroupName'."
               exit 1
           }
-
+           Write-Output "Role assignment start "
           # Assign the Key Vault Secrets User role to the Data Factory's managed identity
           New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionName "Key Vault Secrets User" -Scope $keyVault.ResourceId
-
+          Write-Output "Role assignment End "
           Write-Output "Granted 'Key Vault Secrets User' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'."
 
           # Test access by trying to get the secret
