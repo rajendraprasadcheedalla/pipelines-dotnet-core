@@ -7,7 +7,7 @@ pool:
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'     # Azure service connection name
   resourceGroup: 'dev12-smartpos-rg'             # Resource group where the Data Factory and Key Vault reside
-  keyVaultName: 'dev12smartposkeyvalut'              # Name of the Azure Key Vault
+  keyVaultName: 'smartposkeyvault1'              # Name of the Azure Key Vault
   dataFactoryName: 'dev12smartposadf'        # Name of the Azure Data Factory
   secretName: 'testsecret'  
 stages:
