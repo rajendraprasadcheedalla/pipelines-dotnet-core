@@ -31,7 +31,7 @@ stages:
           $keyVaultId = az keyvault show --name $keyVaultName --resource-group $resourceGroupName --query "id" -o tsv
 
            # Assign the Key Vault Secrets User role to the Data Factory's managed identity
-           az role assignment create --assignee $dataFactory --role "Key Vault Administrator" --scope $keyVaultId
+          az role assignment create --assignee $dataFactory --role "Key Vault Administrator" --scope $keyVaultId
           Write-Output "Granted 'Key Vault Administrator' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'
            # Test access by trying to get the secret
           try {
