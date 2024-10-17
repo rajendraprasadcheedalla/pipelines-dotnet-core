@@ -7,7 +7,7 @@ pool:
 variables:
   azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'     # Azure service connection name
   resourceGroup: 'dev12-smartpos-rg'             # Resource group where the Data Factory and Key Vault reside
-  keyVaultName: 'smartposkeyvault1'              # Name of the Azure Key Vault
+  keyVaultName: 'dev12smartposkeyvalut'              # Name of the Azure Key Vault
   dataFactoryName: 'dev12smartposadf'        # Name of the Azure Data Factory
   secretName: 'testsecret'  
 stages:
@@ -20,20 +20,46 @@ stages:
         azureSubscription: $(azureSubscription)
         ScriptType: 'InlineScript'
         Inline: |
-         # Parameters
-         $resourceGroupName = "$(resourceGroup)"
-         $dataFactoryName = "$(dataFactoryName)"
-         $keyVaultName = "$(keyVaultName)"
-          # Get the Data Factory identity
-          $dataFactory = az datafactory show --name $dataFactoryName --resource-group $resourceGroupName --query "identity.principalId" -o tsv
+          # Parameters
+          $resourceGroupName = "$(resourceGroup)"
+          $dataFactoryName = "$(dataFactoryName)"
+          $keyVaultName = "$(keyVaultName)"
+          $secretName = "$(secretName)"
 
-          # Get the Key Vault ID
-          $keyVaultId = az keyvault show --name $keyVaultName --resource-group $resourceGroupName --query "id" -o tsv
+          # # Login to Azure (if not already logged in)
+          # Connect-AzAccount
+          Write-Output "Data Factory Start "
+          # Get the Data Factory
+          $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Name $dataFactoryName
+          Write-Output "Data Factory End"
 
-           # Assign the Key Vault Secrets User role to the Data Factory's managed identity
-          az role assignment create --assignee $dataFactory --role "Key Vault Contributor" --scope $keyVaultId
-          Write-Output "Granted 'Key Vault Contributor' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'
-           # Test access by trying to get the secret
+          if (-not $dataFactory) {
+              Write-Error "Data Factory '$dataFactoryName' does not exist in resource group '$resourceGroupName'."
+              exit 1
+          }
+          else
+          {
+             Write-Output "Data Factory '$dataFactoryName' exist in resource group '$resourceGroupName'."
+          }
+
+          # Get the principal ID of the Data Factory's managed identity
+          $principalId = $dataFactory.Identity.PrincipalId
+           Write-Output "PrincipalId '$principalId' "
+          # Get the Key Vault resource ID
+          $keyVault = Get-AzKeyVault -VaultName $keyVaultName -ResourceGroupName $resourceGroupName
+          Write-Output "Key Vault '$keyVault' "
+          if (-not $keyVault) {
+              Write-Error "Key Vault '$keyVaultName' does not exist in resource group '$resourceGroupName'."
+              exit 1
+          }
+           Write-Output "Role assignment start "
+          # Assign the Key Vault Secrets User role to the Data Factory's managed identity
+          Write-Output "Key Vault Resource Id '$keyVault.ResourceId' "
+          # New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionName "Key Vault Secrets User" -Scope $keyVault.ResourceId
+          New-AzRoleAssignment  -ObjectId eba63296-87f7-4d35-a2b4-24503e773896 -RoleDefinitionName "Key Vault Reader" -Scope "/subscriptions/cb9ac514-a7d4-4892-8b9d-537c4ad22fb3/resourceGroups/dev12-smartpos-rg/providers/Microsoft.KeyVault/vaults/dev12smartposkeyvalut"
+           Write-Output "Granted 'Key Vault Secrets User' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'."
+           Write-Output "Granted access "
+          # Test access by trying to get the secret
           try {
               $secretValue = Get-AzKeyVaultSecret -VaultName $keyVaultName -Name $secretName
               Write-Output "Successfully retrieved the secret '$($secretValue.Name)'. Value: $($secretValue.SecretValueText)"
