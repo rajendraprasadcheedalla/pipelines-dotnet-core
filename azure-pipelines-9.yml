@@ -28,9 +28,10 @@ stages:
 
           # # Login to Azure (if not already logged in)
           # Connect-AzAccount
-
+          Write-Output "Data Factory Start "
           # Get the Data Factory
           $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Name $dataFactoryName
+          Write-Output "Data Factory End "
 
           if (-not $dataFactory) {
               Write-Error "Data Factory '$dataFactoryName' does not exist in resource group '$resourceGroupName'."
