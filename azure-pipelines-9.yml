@@ -27,7 +27,7 @@ stages:
           $secretName = "$(secretName)"
 
           # Login to Azure (if not already logged in)
-          Connect-AzAccount
+          Connect-AzAccount -DeviceCode
 
           # Get the Data Factory
           $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Name $dataFactoryName
