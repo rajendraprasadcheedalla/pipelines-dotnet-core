@@ -55,7 +55,8 @@ stages:
            Write-Output "Role assignment start "
           # Assign the Key Vault Secrets User role to the Data Factory's managed identity
           Write-Output "Key Vault Resource Id '$keyVault.ResourceId' "
-          New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionName "Key Vault Secrets User" -Scope $keyVault.ResourceId
+          # New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionName "Key Vault Secrets User" -Scope $keyVault.ResourceId
+          New-AzRoleAssignment  -ObjectId $principalId -RoleDefinitionName "Key Vault Secrets User" -Scope "/subscriptions/cb9ac514-a7d4-4892-8b9d-537c4ad22fb3/resourceGroups/dev12-smartpos-rg/providers/Microsoft.KeyVault/vaults/dev12smartposkeyvalut"
           Write-Output "Role assignment End "
           Write-Output "Granted 'Key Vault Secrets User' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'."
 
