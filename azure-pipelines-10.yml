@@ -33,5 +33,12 @@ stages:
            # Assign the Key Vault Secrets User role to the Data Factory's managed identity
            az role assignment create --assignee $dataFactory --role "Key Vault Administrator" --scope $keyVaultId
           Write-Output "Granted 'Key Vault Administrator' role to Data Factory '$dataFactoryName' for Key Vault '$keyVaultName'
+           # Test access by trying to get the secret
+          try {
+              $secretValue = Get-AzKeyVaultSecret -VaultName $keyVaultName -Name $secretName
+              Write-Output "Successfully retrieved the secret '$($secretValue.Name)'. Value: $($secretValue.SecretValueText)"
+          } catch {
+              Write-Error "Failed to retrieve the secret '$($secretName)'. Error: $_"
+              exit 1
           }
         azurePowerShellVersion: 'LatestVersion'
