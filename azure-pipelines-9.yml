@@ -31,19 +31,23 @@ stages:
           Write-Output "Data Factory Start "
           # Get the Data Factory
           $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Name $dataFactoryName
-          Write-Output "Data Factory End  '$dataFactoryName' exists"
+          Write-Output "Data Factory End"
 
           if (-not $dataFactory) {
               Write-Error "Data Factory '$dataFactoryName' does not exist in resource group '$resourceGroupName'."
               exit 1
           }
+          else
+          {
+             Write-Output "Data Factory '$dataFactoryName' exist in resource group '$resourceGroupName'."
+          }
 
           # Get the principal ID of the Data Factory's managed identity
           $principalId = $dataFactory.Identity.PrincipalId
-
+           Write-Output "PrincipalId '$principalId' "
           # Get the Key Vault resource ID
           $keyVault = Get-AzKeyVault -VaultName $keyVaultName -ResourceGroupName $resourceGroupName
-
+          Write-Output "Key Vault '$keyVault' "
           if (-not $keyVault) {
               Write-Error "Key Vault '$keyVaultName' does not exist in resource group '$resourceGroupName'."
               exit 1
