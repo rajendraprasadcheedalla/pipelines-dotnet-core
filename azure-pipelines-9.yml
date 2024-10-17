@@ -31,7 +31,7 @@ stages:
           Write-Output "Data Factory Start "
           # Get the Data Factory
           $dataFactory = Get-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Name $dataFactoryName
-          Write-Output "Data Factory End  '$dataFactory' exists"
+          Write-Output "Data Factory End  '$dataFactoryName' exists"
 
           if (-not $dataFactory) {
               Write-Error "Data Factory '$dataFactoryName' does not exist in resource group '$resourceGroupName'."
