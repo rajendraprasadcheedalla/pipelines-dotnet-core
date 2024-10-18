@@ -44,18 +44,19 @@ stages:
           $userPrincipalName = "$(userPrincipalName)"
           $roleDefinitionName = "$(roleDefinitionName)"
           $scope = "$(scope)"
-
+           Write-Output " User $userPrincipalName "
           # Get the user's object ID
           $user = Get-AzADUser -UserPrincipalName $userPrincipalName
           $userId = $user.Id
+          Write-Output " User Id $userId "
 
           # Get the role definition ID
           $roleDefinition = Get-AzRoleDefinition -Name $roleDefinitionName
           $roleDefinitionId = $roleDefinition.Id
+          Write-Output " Role Definition Id $roleDefinitionId "
 
           # Create the role assignment
           New-AzRoleAssignment -ObjectId $userId -RoleDefinitionId $roleDefinitionId -Scope $scope
-
-           
-          }
+          
+          
         azurePowerShellVersion: 'LatestVersion'
