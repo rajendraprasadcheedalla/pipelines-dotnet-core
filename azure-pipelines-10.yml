@@ -40,7 +40,7 @@ stages:
 
           script:
           # PowerShell script to create a role assignment
-        
+          Write-Output " Start "
           $userPrincipalName = "$(userPrincipalName)"
           $roleDefinitionName = "$(roleDefinitionName)"
           $scope = "$(scope)"
