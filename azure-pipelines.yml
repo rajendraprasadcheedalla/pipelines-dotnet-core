@@ -6,7 +6,7 @@ pool:
 
 variables:
   resourceGroupName: 'myTestResourceGroup'
-  location: 'East US'
+  location: 'southindia'
   templateFile: '$(Build.ArtifactStagingDirectory)\armTemplate.json'
 
 steps:
