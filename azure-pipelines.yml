@@ -1,31 +1,43 @@
 trigger:
-- main
+- master
 
 pool:
-  vmImage: ubuntu-latest
-
-variables:
-  azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-  resourceGroupName: 'ap-dev-apollo2-smartpos-rg'
-  location: 'eastasia'
-  storageAccountName: 'apdevapollo2possmart01'
-  # containerName: 'posinventorycontainer'
-  # configTableName: 'InventoryFlowSettings'
-  # lookupTableName: 'StoreSmartPosLookup'
+  vmImage: 'windows-latest'
 
 steps:
-- script: echo start create development infrastructure!
-  displayName: 'Run a one-line script'
-
-- task: AzureCLI@2
+- task: PowerShell@2
   inputs:
-    azureSubscription: 'Visual Studio Professional(cb9ac514-a7d4-4892-8b9d-537c4ad22fb3)'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      if [ $(az group exists --name $resourceGroup) = false ]; then 
-        az group create  --location $location --resource-group  $resourceGroupName
-      else
-        echo $resourceGroup is existing
-      fi
+    targetType: 'inline'
+    script: |
+      # Define the parameters for the ARM template
+      $resourceGroupName = "myResourceGroup"
+      $location = "East US"
+
+      # Define the ARM template structure
+      $armTemplate = @{
+          "$schema" = "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"
+          "contentVersion" = "1.0.0.0"
+          "resources" = @(
+              @{
+                  "type" = "Microsoft.Resources/resourceGroups"
+                  "apiVersion" = "2021-04-01"
+                  "name" = $resourceGroupName
+                  "location" = $location
+              }
+          )
+      }
+
+      # Convert the ARM template to JSON
+      $jsonTemplate = $armTemplate | ConvertTo-Json -Depth 100
       
+      # Save the JSON to a file
+      $templatePath = "$(Build.ArtifactStagingDirectory)\armTemplate.json"
+      $jsonTemplate | Out-File -FilePath $templatePath -Encoding utf8
+
+      Write-Host "ARM template generated at: $templatePath"
+    
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ArmTemplate'
+    publishLocation: 'Container'
