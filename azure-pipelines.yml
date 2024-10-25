@@ -4,15 +4,16 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+variables:
+  resourceGroupName: 'myTestResourceGroup'
+  location: 'East US'
+  templateFile: '$(Build.ArtifactStagingDirectory)\armTemplate.json'
+
 steps:
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
     script: |
-      # Define the parameters for the ARM template
-      $resourceGroupName = "myResourceGroup"
-      $location = "East US"
-
       # Define the ARM template structure
       $armTemplate = @{
           "$schema" = "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"
@@ -21,8 +22,8 @@ steps:
               @{
                   "type" = "Microsoft.Resources/resourceGroups"
                   "apiVersion" = "2021-04-01"
-                  "name" = $resourceGroupName
-                  "location" = $location
+                  "name" = "$(resourceGroupName)"
+                  "location" = "$(location)"
               }
           )
       }
@@ -31,13 +32,43 @@ steps:
       $jsonTemplate = $armTemplate | ConvertTo-Json -Depth 100
       
       # Save the JSON to a file
-      $templatePath = "$(Build.ArtifactStagingDirectory)\armTemplate.json"
-      $jsonTemplate | Out-File -FilePath $templatePath -Encoding utf8
+      $jsonTemplate | Out-File -FilePath "$(templateFile)" -Encoding utf8
 
-      Write-Host "ARM template generated at: $templatePath"
-    
-- task: PublishBuildArtifacts@1
+      Write-Host "ARM template generated at: $(templateFile)"
+
+- task: AzureCLI@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'ArmTemplate'
-    publishLocation: 'Container'
+    azureSubscription: 'AzureServiceConnectionTest'  # Replace with your Azure service connection name
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Create the resource group if it doesn't exist
+      az group create --name $(resourceGroupName) --location $(location)
+
+      # Deploy the ARM template
+      az deployment group create --resource-group $(resourceGroupName) --template-file $(templateFile) --parameters @{} # Add parameters if needed
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'AzureServiceConnectionTest'  # Replace with your Azure service connection name
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Validate the deployment (ensure it was successful)
+      $deploymentStatus = az deployment group show --resource-group $(resourceGroupName) --name $(resourceGroupName) --query 'properties.provisioningState' -o tsv
+
+      if ($deploymentStatus -eq "Succeeded") {
+          Write-Host "Deployment succeeded."
+      } else {
+          Write-Error "Deployment failed with status: $deploymentStatus"
+          exit 1
+      }
+
+# - task: AzureCLI@2
+#   inputs:
+#     azureSubscription: 'AzureServiceConnectionTest'  # Replace with your Azure service connection name
+#     scriptType: 'ps'
+#     scriptLocation: 'inlineScript'
+#     inlineScript: |
+#       # Clean up the resource group after testing
+#       az group delete --name $(resourceGroupName) --yes --no-wait
